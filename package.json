@@ -7,7 +7,7 @@
     "test": "test"
   },
   "scripts": {
-    "test": "jasmine tests.js"
+    "test": "jasmine-node test"
   },
   "repository": {
     "type": "git",
@@ -18,5 +18,14 @@
   "bugs": {
     "url": "https://github.com/adedapopaul/BC-18-QUIZ-APPLICATION/issues"
   },
-  "homepage": "https://github.com/adedapopaul/BC-18-QUIZ-APPLICATION#readme"
+  "homepage": "https://github.com/adedapopaul/BC-18-QUIZ-APPLICATION#readme",
+  "dependencies": {
+    "ejs": "^2.5.5",
+    "express": "^4.14.0",
+    "path": "^0.12.7",
+    "request": "^2.79.0"
+  },
+  "devDependencies": {
+    "jasmine-node": "^1.14.5"
+  }
 }
