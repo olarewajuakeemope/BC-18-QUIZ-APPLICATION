@@ -1,7 +1,8 @@
 var express = require('express');
 var app = express();
 var path = require('path');
-
+var database = require('./database');
+var admin = require("firebase-admin");
 var port = process.env.PORT || 3000;
 
 
