@@ -1,0 +1,89 @@
+{
+	"mathQuestions": [{
+		"question": "An array is a set of numbers",
+		"ans": "yes",
+		"choice": ["Ask Google", "No", "yes"]
+	}, {
+		"question": "Divide 6 by 2?",
+		"ans": "3",
+		"choice": ["3", "12", "1"]
+	}, {
+		"question": "Example of a decimal is",
+		"ans": "0.3",
+		"choice": ["0.3", "12", "2"]
+	}, {
+		"question": "Example of numbers are?",
+		"ans": "22/3",
+		"choice": ["Andela", "BFA", "22/3"]
+	}, {
+		"question": "Is 22 a decimal?",
+		"ans": "no",
+		"choice": ["yes", "You didnt teach me", "no"]
+	}, {
+		"question": "Is 3 an integer",
+		"ans": "yes",
+		"choice": ["yes", "no", "i cany tell"]
+	}, {
+		"question": "Is 8 divisible by 2?",
+		"ans": "yes",
+		"choice": ["yes", "no", "i dont know"]
+	}, {
+		"question": "What is the sum of 12 and 3",
+		"ans": "15",
+		"choice": ["15", "22", "88"]
+	}, {
+		"question": "What is the value of pi?",
+		"ans": "22/7",
+		"choice": ["12", "22/7", "3.33"]
+	}, {
+		"question": "what is the product of 2 and 3?",
+		"ans": "6",
+		"choice": ["12", "15", "6"]
+	}],
+
+
+
+
+	"programmingQuestions": [{
+		"question": "An example of styling language is JAVA",
+		"ans": "no",
+		"choice": ["yes", "no", "yes and no"]
+	}, {
+		"question": "C is a programmning language",
+		"ans": "yes",
+		"choice": ["yes", "no", "i cant say"]
+	}, {
+		"question": "Computers are design in Andela",
+		"ans": "no",
+		"choice": ["yes", "no", "i cant say"]
+	}, {
+		"question": "EC6 is an upgrade of ECMASCRIPT 5",
+		"ans": "yes",
+		"choice": ["yes", "no", "i cant say"]
+	}, {
+		"question": "English is an example of programming language",
+		"ans": "no",
+		"choice": ["It was a programming language in 2016", "yes", "no"]
+	}, {
+		"question": "HTML is a programming language",
+		"ans": "no",
+		"choice": ["yes", "no", "i cant say"]
+	}, {
+		"question": "Javascript is an example of data type",
+		"ans": "no",
+		"choice": ["yes", "no", "i cant say"]
+	}, {
+		"question": "One of the method of authentication is via",
+		"ans": "Email and password",
+		"choice": ["Email and password", "singing", "eating"]
+	}, {
+		"question": "Software engineers repairs computers?",
+		"ans": "yes",
+		"choice": ["yes", "no", "i cant say"]
+	}, {
+		"question": "Web pages are a typical example of software engineering product?",
+		"ans": "yes",
+		"choice": ["i cant say", "yes", "no"]
+	}]
+
+}
