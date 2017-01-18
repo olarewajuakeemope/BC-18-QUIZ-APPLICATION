@@ -6,9 +6,18 @@ var path = require('path');
 
 var admin = require("firebase-admin");
 
+var serviceAccount = require("./quizapp-2105e-firebase-adminsdk-nzjji-1430e2c327.json");
+
+admin.initializeApp({
+  credential: admin.credential.cert(serviceAccount),
+  databaseURL: "https://quizapp-2105e.firebaseio.com"
+});
+
+
+
 
 var firebase = require('firebase').initializeApp({
-	serviceAccount: "./quizapp-a3f3a876242f.json",
+	serviceAccount,
 	databaseURL : 'https://quizapp-2105e.firebaseio.com/'
 })
 
