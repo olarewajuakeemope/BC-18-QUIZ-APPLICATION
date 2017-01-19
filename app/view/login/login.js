@@ -2,15 +2,7 @@
 
 var login = document.getElementById('login');
 var start = document.getElementById('start');
-var config = {
-        apiKey: "AIzaSyA3-v85rBZXODtmUzkHcwYVRYg6Khw_IAg",
-        authDomain: "quizapp-2105e.firebaseapp.com",
-        databaseURL: "https://quizapp-2105e.firebaseio.com",
-        storageBucket: "quizapp-2105e.appspot.com",
-        messagingSenderId: "80293514890"
-      };		
-
-firebase.initializeApp(config);
+var username;
  
 login.addEventListener('click', function(){
        var provider = new firebase.auth.GoogleAuthProvider();
@@ -35,6 +27,7 @@ login.addEventListener('click', function(){
         // add reatime listener
         firebase.auth().onAuthStateChanged (firebaseUser => {    
             if (firebaseUser){
+            	username = firebaseUser.displayName;
                 console.log(firebaseUser.displayName);
               document.getElementById("welcome").innerHTML = "Welcome " + firebaseUser.displayName;
               getQuestion();
@@ -56,8 +49,7 @@ function getQuestion(){
   		// var questions = [];
   		var questionsMath =[];
   		var questionsProg = [];
-
-
+  		var numCorrect = 0;
 
 		// As an admin, the app has access to read and write all data, regardless of Security Rules
 		//LOAD MATH QUESTIONS AND RETURN 5 RANDOM QUESTION TO THE USER
@@ -71,194 +63,207 @@ function getQuestion(){
 		        snap.forEach(function(childSnap){
 		        	
 		         var  arrVal = childSnap.val();
-	         	// // console.log(arrVal)
-	         	// var question = arrVal.question;
-	         	// var ans = arrVal.ans;
-	         	// var choice = arrVal.choice;
-	         	// console.log(choice);
-	         	questionsProg.push(arrVal);  	
-
-
-		       
-		         }) 
-		          	          
+	         		questionsProg.push(arrVal);  	
+		        })      	          
 	        })
 
+				/////GET MATH QUESTIONS FROM FIREBASE
 			var db = firebase.database().ref().child('quiz/mathQuestions');
 			db.orderByKey().once("value", function(snap){
-		        snap.forEach(function(childSnap){
-		        	
+		        snap.forEach(function(childSnap){	
 		         var  arrVal = childSnap.val();
-	         	
 	         	questionsMath.push(arrVal);  	
-
-
-		       
-		         }) 
-		          	          
-	        })
-	
-
-
-
-
-			var db = firebase.database().ref().child('quiz/programmingQuestions');
-			db.orderByKey().once("value", function(snap){
-		        snap.forEach(function(childSnap){
-		        	
-		         var  arrVal = childSnap.val();
-	         	questionsProg.push(arrVal);  	
-
-
-		       
-		         }) 
-		          	          
+		         })       	          
 	        })
 
 
-	var mergeQuestion=  Object.assign(questionsProg, questionsMath);
-	
-	
 
-  // Display initial question
-  displayNext();
+		var mergeQuestion=  Object.assign(questionsProg, questionsMath);
+		console.log(mergeQuestion);
+		// var ansHolder = [];
+		// for (var i = 0; i < mergeQuestion.length; i++){
+		// 	ansHolder.push(mergeQuestion.i.ans)
+		// }
+		// console.log(ansHolder);
+
+
+
+	  // Display initial question
+	  displayNext();
+	  
+	  // Click handler for the 'next' button
+	  $('#next').on('click', function (e) {
+	    e.preventDefault();
+	    
+	    // Suspend click listener during fade animation
+	    if(quiz.is(':animated')) {        
+	      return false;
+	    }
+	    choose();
+	    
+	    // // If no user selection, progress is stopped
+	    // if (isNaN(selections[questionCounter])) {
+	    //   alert('Please make a selection!');
+	    // } else {
+	      questionCounter++;
+	      displayNext();
+	    // }
+	  });
   
-  // Click handler for the 'next' button
-  $('#next').on('click', function (e) {
-    e.preventDefault();
-    
-    // Suspend click listener during fade animation
-    if(quiz.is(':animated')) {        
-      return false;
-    }
-    choose();
-    
-    // If no user selection, progress is stopped
-    if (isNaN(selections[questionCounter])) {
-      alert('Please make a selection!');
-    } else {
-      questionCounter++;
-      displayNext();
-    }
-  });
+	  // Click handler for the 'prev' button
+	  $('#prev').on('click', function (e) {
+	    e.preventDefault();
+	    
+	    if(quiz.is(':animated')) {
+	      return false;
+	    }
+	    choose();
+	    questionCounter--;
+	    displayNext();
+	  });
+	  
+	  // Click handler for the 'Start Over' button
+	  $('#start').on('click', function (e) {
+	    e.preventDefault();
+	    
+	    if(quiz.is(':animated')) {
+	      return false;
+	    }
+	    questionCounter = 0;
+	    selections = [];
+	    displayNext();
+	    $('#start').hide();
+	  });
+	  
+	  // Animates buttons on hover
+	  $('.button').on('mouseenter', function () {
+	    $(this).addClass('active');
+	  });
+	  $('.button').on('mouseleave', function () {
+	    $(this).removeClass('active');
+	  });
+	  
+	  // Creates and returns the div that contains the questions and 
+	  // the answer selections
+	  function createQuestionElement(index) {
+	    var qElement = $('<div>', {
+	      id: 'question'
+	    });
+	    
+	    var header = $('<h2>Question ' + (index + 1) + ':</h2>');
+	    qElement.append(header);
+	    
+	    var question = $('<p>').append(mergeQuestion[index].question);
+	    qElement.append(question);
+	    
+	    var radioButtons = createRadios(index);
+	    qElement.append(radioButtons);
+	    
+	    return qElement;
+	  }
   
-  // Click handler for the 'prev' button
-  $('#prev').on('click', function (e) {
-    e.preventDefault();
-    
-    if(quiz.is(':animated')) {
-      return false;
-    }
-    choose();
-    questionCounter--;
-    displayNext();
-  });
+	  // Creates a list of the answer choices as radio inputs
+	  function createRadios(index) {
+	    var radioList = $('<ul>');
+	    var item;
+	    var input = '';
+	    for (var i = 0; i < mergeQuestion[index].choice.length; i++) {
+	      item = $('<li>');
+	      input = '<input type="radio" name="answer" value=' + i + ' />';
+	      input += mergeQuestion[index].choice[i];
+	      item.append(input);
+	      radioList.append(item);
+	    }
+	    return radioList;
+	  }
   
-  // Click handler for the 'Start Over' button
-  $('#start').on('click', function (e) {
-    e.preventDefault();
-    
-    if(quiz.is(':animated')) {
-      return false;
-    }
-    questionCounter = 0;
-    selections = [];
-    displayNext();
-    $('#start').hide();
-  });
-  
-  // Animates buttons on hover
-  $('.button').on('mouseenter', function () {
-    $(this).addClass('active');
-  });
-  $('.button').on('mouseleave', function () {
-    $(this).removeClass('active');
-  });
-  
-  // Creates and returns the div that contains the questions and 
-  // the answer selections
-  function createQuestionElement(index) {
-    var qElement = $('<div>', {
-      id: 'question'
-    });
-    
-    var header = $('<h2>Question ' + (index + 1) + ':</h2>');
-    qElement.append(header);
-    
-    var question = $('<p>').append(mergeQuestion[index].question);
-    qElement.append(question);
-    
-    var radioButtons = createRadios(index);
-    qElement.append(radioButtons);
-    
-    return qElement;
-  }
-  
-  // Creates a list of the answer choices as radio inputs
-  function createRadios(index) {
-    var radioList = $('<ul>');
-    var item;
-    var input = '';
-    for (var i = 0; i < mergeQuestion[index].choice.length; i++) {
-      item = $('<li>');
-      input = '<input type="radio" name="answer" value=' + i + ' />';
-      input += mergeQuestion[index].choice[i];
-      item.append(input);
-      radioList.append(item);
-    }
-    return radioList;
-  }
-  
-  // Reads the user selection and pushes the value to an array
-  function choose() {
-    selections[questionCounter] = +$('input[name="answer"]:checked').val();
-  }
-  
-  // Displays next requested element
-  function displayNext() {
-    quiz.fadeOut(function() {
-      $('#question').remove();
-      
-      if(questionCounter < mergeQuestion.length){
-        var nextQuestion = createQuestionElement(questionCounter);
-        quiz.append(nextQuestion).fadeIn();
-        if (!(isNaN(selections[questionCounter]))) {
-          $('input[value='+selections[questionCounter]+']').prop('checked', true);
-        }
-        
-        // Controls display of 'prev' button
-        if(questionCounter === 1){
-          $('#prev').show();
-        } else if(questionCounter === 0){
-          
-          $('#prev').hide();
-          $('#next').show();
-        }
-      }else {
-        var scoreElem = displayScore();
-        quiz.append(scoreElem).fadeIn();
-        $('#next').hide();
-        $('#prev').hide();
-        $('#start').show();
-      }
-    });
-  }
-  
-  // Computes score and returns a paragraph element to be displayed
-  function displayScore() {
-    var score = $('<p>',{id: 'question'});
-    
-    var numCorrect = 0;
-    for (var i = 0; i < selections.length; i++) {
-      if (selections[i] === mergeQuestion[i].ans) {
-        numCorrect++;
-      }
-    }
-    
-    score.append('You got ' + numCorrect + ' questions out of ' +
-                 mergeQuestion.length + ' right!!!');
-    return score;
-  }
+	  // // Reads the user selection and pushes the value to an array
+	  // function choose() {
+	  //   selections[questionCounter] = +$('input[name="answer"]:checked').val();
+	  //  	console.log(selections);
+	  // }
+	  
+	  // Displays next requested element
+	  function displayNext() {
+		    quiz.fadeOut(function() {
+		      $('#question').remove();
+		      
+		      if(questionCounter < mergeQuestion.length){
+		        var nextQuestion = createQuestionElement(questionCounter);
+		        quiz.append(nextQuestion).fadeIn();
+		        if (!(isNaN(selections[questionCounter]))) {
+		          $('input[value='+selections[questionCounter]+']').prop('checked', true);
+		        }
+		        
+		        // Controls display of 'prev' button
+		        if(questionCounter === 1){
+		          $('#prev').show();
+		        } else if(questionCounter === 0){
+		          
+		          $('#prev').hide();
+		          $('#next').show();
+		        }
+		      }else {
+		        var scoreElem = displayScore();
+		        quiz.append(scoreElem).fadeIn();
+		        $('#next').hide();
+		        $('#prev').hide();
+		        $('#start').show();
+		      }
+		    });
+	    }
+
+
+
+	    //function to get getSelected botton
+		function choose(){
+			selections[questionCounter] = +$(".modal-body input[type=radio]").each(function(){
+			    if (this.checked){
+			        selections.push(this.value);
+			        this.checked = false;
+			    }
+			});
+
+		}
+
+
+	  
+	  // Computes score and returns a paragraph element to be displayed
+	  function displayScore() {
+	    var score = $('<p>',{id: 'question'});
+	  
+	    for (var i = 0; i < mergeQuestion.length; i++) {
+	      if (mergeQuestion[i] === selections[i]) {
+	        numCorrect++;
+	      }
+	    }
+	    var userScore = (numCorrect  * 100)
+		updateDB(userScore);
+
+	    
+	    score.append('You got ' + numCorrect + ' questions out of ' +
+	                 mergeQuestion.length + ' right!!!');
+	    return score;
+	  }
+
+
+
+
+
+	var database = firebase.database();
+
+	var path = firebase.database().ref('/users');
+
+	function updateDB(score){
+		let pathRef = firebase.database().ref('/users/' + username)
+		pathRef.child(score).update({
+			"score": score,
+		});
+		
+	}
+
+
+
 };
        
      
