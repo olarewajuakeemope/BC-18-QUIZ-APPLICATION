@@ -1,5 +1,17 @@
-var login = document.getElementById('login');
 
+
+var login = document.getElementById('login');
+var start = document.getElementById('start');
+var config = {
+        apiKey: "AIzaSyA3-v85rBZXODtmUzkHcwYVRYg6Khw_IAg",
+        authDomain: "quizapp-2105e.firebaseapp.com",
+        databaseURL: "https://quizapp-2105e.firebaseio.com",
+        storageBucket: "quizapp-2105e.appspot.com",
+        messagingSenderId: "80293514890"
+      };		
+
+firebase.initializeApp(config);
+ 
 login.addEventListener('click', function(){
        var provider = new firebase.auth.GoogleAuthProvider();
 
@@ -28,72 +40,200 @@ login.addEventListener('click', function(){
             }
 
         })
+
+
+
+
+		/////////////////////////////////////////////////////////////
+		/// SET DOCUMENT VARIABLEA AND COUNTERS ////////////////////
+
+		var questionCounter = 0; //Tracks question number
+  		var selections = []; //Array containing user choices
+  		var quiz = $('#quiz'); //Quiz div object
+
+
+
+		// As an admin, the app has access to read and write all data, regardless of Security Rules
+		//LOAD MATH QUESTIONS AND RETURN 5 RANDOM QUESTION TO THE USER
+		// function getMathQuestion(){
+			//SET AN EMPTY ARRAY TO SAVE THE QUESTION
+			
+
+			var db = firebase.database().ref().child('quiz/programmingQuestions');
+			db.orderByKey().on("value", function(snap){
+		        snap.forEach(function(childSnap){
+		        	//RANDOMIZE 5 QUESTION
+		        
+		         for (var i = 0; i < Math.floor((Math.random() * 9) + 1);  i++) {
+		         	var  arrVal = childSnap.val();
+		         	var question = arrVal.question;
+		         	var ans = arrVal.ans;
+		         	var choice = arrVal.choice;
+		         	console.log(choice);
+
+		         	createQuestionElement();
+		         	// createRadios(i);
+
+
+		         	 var radioList = $('<ul>');
+			    var item;
+			    var input = '';
+			    for (var i = 0; i < 3; i++) {
+			      item = $('<li>');
+			      input = '<input type="radio" name="answer" value=' + i + ' />';
+			      for (var i = 0; i < 3; i++) {
+			      		input += question[index].choices.length;
+				      item.append(input);
+				      radioList.append(item);
+			      	 }
+			      
+			    }
+
+		         } 
+		          	          
+
+		          })
+	            
+	        });
+	     
+
+
+
+
+			function computeScore(){
+						for (var i = 0; i < selections.length; i++) {
+						      if (selections[i] === question[i].ans) {
+						        numCorrect++;
+						      }
+						    }
+			}
+
+
+		// Computes score and returns a paragraph element to be displayed
+		  function displayScore() {
+		    var score = $('<p>',{id: 'question'});
+		    
+		    var numCorrect = 0;
+		    
+		    score.append('You got ' + numCorrect + ' questions out of ' +
+		                 question.length + ' right!!!');
+		    return score;
+		  }
+
+
+
+
+		  ///////////////////////////////////////////////////////////////////////////////////
+		  //////			BUTTON CONTROL												////
+
+		  // Displays next requested element
+			  function displayNext() {
+			    quiz.fadeOut(function() {
+			      $('#question').remove();
+			      
+			      if(questionCounter < question.length){
+			        var nextQuestion = createQuestionElement(questionCounter);
+			        quiz.append(nextQuestion).fadeIn();
+			        if (!(isNaN(selections[questionCounter]))) {
+			          $('input[value='+selections[questionCounter]+']').prop('checked', true);
+			        }
+			        
+			        // Controls display of 'prev' button
+			        if(questionCounter === 1){
+			          $('#prev').show();
+			        } else if(questionCounter === 0){
+			          
+			          $('#prev').hide();
+			          $('#next').show();
+			        }
+			      }else {
+			        var scoreElem = displayScore();
+			        quiz.append(scoreElem).fadeIn();
+			        $('#next').hide();
+			        $('#prev').hide();
+			        $('#start').show();
+			      }
+			    });
+			  }
+
+
+			  // Click handler for the 'Start Over' button
+				  $('#start').on('click', function (e) {
+				    e.preventDefault();
+				    
+				    if(quiz.is(':animated')) {
+				      return false;
+				    }
+				    questionCounter = 0;
+				    selections = [];
+				    displayNext();
+				    $('#start').hide();
+				  });
+				  
+				  // Animates buttons on hover
+				  $('.button').on('mouseenter', function () {
+				    $(this).addClass('active');
+				  });
+				  $('.button').on('mouseleave', function () {
+				    $(this).removeClass('active');
+				  });
+				  
+
+		//////////////////////////////////////////////////////////////////////////////////////
+		////			QUIZ DISPLAY ELEMENT FUNCTIONS									/////
+		// Creates and returns the div that contains the questions and  the answer selections
+	
+		  function createQuestionElement(index) {
+		    var qElement = $('<div>', {
+		      id: 'question'
+		    });
+		    
+		    var header = $('<h2>Question ' + (index + 1) + ':</h2>');
+		    qElement.append(header);
+		    
+		    var question = $('<p>').append(question);
+		    qElement.append(question);
+		    
+		    var radioButtons = createRadios(index);
+		    qElement.append(radioButtons);
+		    
+		    return qElement;
+		  }
+
+
+		  // // Creates a list of the answer choices as radio inputs
+			 //  function createRadios(index) {
+			 //    var radioList = $('<ul>');
+			 //    var item;
+			 //    var input = '';
+			 //    for (var i = 0; i < 3; i++) {
+			 //      item = $('<li>');
+			 //      input = '<input type="radio" name="answer" value=' + i + ' />';
+			 //      for (var i = 0; i < 3; i++) {
+			 //      		input += question[index].choices.length;
+				//       item.append(input);
+				//       radioList.append(item);
+			 //      	 }
+			      
+			 //    }
+			 //    return radioList;
+			 //  }
+
+
+			  // Reads the user selection and pushes the value to an array
+			  function choose() {
+			    selections[questionCounter] = +$('input[name="answer"]:checked').val();
+			  }
+
+
+
 })
+
+
+
+
        
      
 
 
 
-
-
-// //initialixe login function
-// (function(){
-//       var config = {
-//     apiKey: "AIzaSyA3-v85rBZXODtmUzkHcwYVRYg6Khw_IAg",
-//     authDomain: "quizapp-2105e.firebaseapp.com",
-//     databaseURL: "https://quizapp-2105e.firebaseio.com",
-//     storageBucket: "quizapp-2105e.appspot.com",
-//     messagingSenderId: "80293514890"
-//   };
-//   firebase.initializeApp(config);
-
-    
-    
-//     //add login event
-    
-// login.addEventListener('click', e => {
-//     // get email and pass
-//     const email = $('#email').val();
-//     const pass = $('#password').val();
-//     const login = $('#login').val();
-//     const auth = firebase.auth();
-    
-//     //sign in
-//     const promise= auth.signInWithEmailAndPassword(email, pass);
-//     promise.catch(e => console.log(e.message));
-// })
-
-// // add signUp event
-//     // signUp.addEventListener('click', e => {
-//     // // get email and pass
-//     // const email = $('#email').val();
-//     // const pass = $('#password').val();
-//     // const signUp = $('#signUp').val();
-//     // const auth = firebase.auth();
-    
-//     // //sign up
-//     // const promise= auth.createUserWithEmailAndPassword(email, pass);
-//     // promise.catch(e => console.log(e.message));
-//     // })
-    
-// //log out
-// logout.addEventListener('click', e => {
-//     // get email and pass
-//    firebase.auth().signOut();
-// })
-
-// // add reatime listener
-// firebase.auth().onAuthStateChanged (firebaseUser => {    
-//     if (firebaseUser){
-//         console.log(firebaseUser);
-//         logout.classList.remove('hide');
-        
-//     }else{
-//         console.log('not logged in');
-//         logout.classList.add('hide');
-//     }
-
-
-// });
-
-// }());
