@@ -37,7 +37,7 @@ login.addEventListener('click', function(){
             if (firebaseUser){
                 console.log(firebaseUser.displayName);
               document.getElementById("welcome").innerHTML = "Welcome " + firebaseUser.displayName;
-              getMathQuestion();
+              getQuestion();
             }
 
         })
@@ -46,14 +46,16 @@ login.addEventListener('click', function(){
 })
 
 
-function getMathQuestion(){
+function getQuestion(){
 		/////////////////////////////////////////////////////////////
 		/// SET DOCUMENT VARIABLEA AND COUNTERS ////////////////////
 
 		var questionCounter = 0; //Tracks question number
   		var selections = []; //Array containing user choices
   		var quiz = $('#quiz'); //Quiz div object
-  		var questions = [];
+  		// var questions = [];
+  		var questionsMath =[];
+  		var questionsProg = [];
 
 
 
@@ -63,6 +65,7 @@ function getMathQuestion(){
 			//SET AN EMPTY ARRAY TO SAVE THE QUESTION
 			
 
+		/////////GET PROGRAMMING QUESTIONS
 			var db = firebase.database().ref().child('quiz/programmingQuestions');
 			db.orderByKey().once("value", function(snap){
 		        snap.forEach(function(childSnap){
@@ -73,7 +76,38 @@ function getMathQuestion(){
 	         	// var ans = arrVal.ans;
 	         	// var choice = arrVal.choice;
 	         	// console.log(choice);
-	         	questions.push(arrVal);  	
+	         	questionsProg.push(arrVal);  	
+
+
+		       
+		         }) 
+		          	          
+	        })
+
+			var db = firebase.database().ref().child('quiz/mathQuestions');
+			db.orderByKey().once("value", function(snap){
+		        snap.forEach(function(childSnap){
+		        	
+		         var  arrVal = childSnap.val();
+	         	
+	         	questionsMath.push(arrVal);  	
+
+
+		       
+		         }) 
+		          	          
+	        })
+	
+
+
+
+
+			var db = firebase.database().ref().child('quiz/programmingQuestions');
+			db.orderByKey().once("value", function(snap){
+		        snap.forEach(function(childSnap){
+		        	
+		         var  arrVal = childSnap.val();
+	         	questionsProg.push(arrVal);  	
 
 
 		       
@@ -82,7 +116,9 @@ function getMathQuestion(){
 	        })
 
 
-
+	var mergeQuestion=  Object.assign(questionsProg, questionsMath);
+	
+	
 
   // Display initial question
   displayNext();
@@ -149,7 +185,7 @@ function getMathQuestion(){
     var header = $('<h2>Question ' + (index + 1) + ':</h2>');
     qElement.append(header);
     
-    var question = $('<p>').append(questions[index].question);
+    var question = $('<p>').append(mergeQuestion[index].question);
     qElement.append(question);
     
     var radioButtons = createRadios(index);
@@ -163,10 +199,10 @@ function getMathQuestion(){
     var radioList = $('<ul>');
     var item;
     var input = '';
-    for (var i = 0; i < questions[index].choice.length; i++) {
+    for (var i = 0; i < mergeQuestion[index].choice.length; i++) {
       item = $('<li>');
       input = '<input type="radio" name="answer" value=' + i + ' />';
-      input += questions[index].choice[i];
+      input += mergeQuestion[index].choice[i];
       item.append(input);
       radioList.append(item);
     }
@@ -183,7 +219,7 @@ function getMathQuestion(){
     quiz.fadeOut(function() {
       $('#question').remove();
       
-      if(questionCounter < questions.length){
+      if(questionCounter < mergeQuestion.length){
         var nextQuestion = createQuestionElement(questionCounter);
         quiz.append(nextQuestion).fadeIn();
         if (!(isNaN(selections[questionCounter]))) {
@@ -214,19 +250,16 @@ function getMathQuestion(){
     
     var numCorrect = 0;
     for (var i = 0; i < selections.length; i++) {
-      if (selections[i] === questions[i].correctAnswer) {
+      if (selections[i] === mergeQuestion[i].ans) {
         numCorrect++;
       }
     }
     
     score.append('You got ' + numCorrect + ' questions out of ' +
-                 questions.length + ' right!!!');
+                 mergeQuestion.length + ' right!!!');
     return score;
   }
 };
-
-
-
        
      
 
