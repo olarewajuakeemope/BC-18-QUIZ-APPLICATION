@@ -249,7 +249,7 @@ body {
 }
 
 #container {
-    width:50%;
+    width:65%;
     margin:auto;
     padding: 0 25px 40px 10px;
     background-color: #eee;
@@ -263,4 +263,14 @@ ul {
     list-style-type: none;
     padding: 0;
     margin: 0;
+}
+
+.white{
+  color: white;
+}
+.extra{
+  size: 4em !important;
+}
+.new-font{
+  font-family: georgia
 }

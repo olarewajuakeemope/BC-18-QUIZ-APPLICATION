@@ -1,5 +1,4 @@
 
-
 var login = document.getElementById('login');
 var start = document.getElementById('start');
 var username;
@@ -28,7 +27,6 @@ login.addEventListener('click', function(){
         firebase.auth().onAuthStateChanged (firebaseUser => {    
             if (firebaseUser){
             	username = firebaseUser.displayName;
-                console.log(firebaseUser.displayName);
               document.getElementById("welcome").innerHTML = "Welcome " + firebaseUser.displayName;
               getQuestion();
             }
@@ -41,22 +39,23 @@ login.addEventListener('click', function(){
 
 function getQuestion(){
 		/////////////////////////////////////////////////////////////
-		/// SET DOCUMENT VARIABLEA AND COUNTERS ////////////////////
+		/// SET DOCUMENT VARIABLE AND COUNTERS ////////////////////
 
 		var questionCounter = 0; //Tracks question number
   		var selections = []; //Array containing user choices
   		var quiz = $('#quiz'); //Quiz div object
-  		// var questions = [];
   		var questionsMath =[];
   		var questionsProg = [];
   		var numCorrect = 0;
+  		console.log(selections);
+
+  		var numCorrect = 0;  //initiate score 
+
 
 		// As an admin, the app has access to read and write all data, regardless of Security Rules
 		//LOAD MATH QUESTIONS AND RETURN 5 RANDOM QUESTION TO THE USER
 		// function getMathQuestion(){
 			//SET AN EMPTY ARRAY TO SAVE THE QUESTION
-			
-
 		/////////GET PROGRAMMING QUESTIONS
 			var db = firebase.database().ref().child('quiz/programmingQuestions');
 			db.orderByKey().once("value", function(snap){
@@ -66,7 +65,6 @@ function getQuestion(){
 	         		questionsProg.push(arrVal);  	
 		        })      	          
 	        })
-
 				/////GET MATH QUESTIONS FROM FIREBASE
 			var db = firebase.database().ref().child('quiz/mathQuestions');
 			db.orderByKey().once("value", function(snap){
@@ -77,18 +75,7 @@ function getQuestion(){
 	        })
 
 
-
-		var mergeQuestion=  Object.assign(questionsProg, questionsMath);
-		console.log(mergeQuestion);
-		// var ansHolder = [];
-		// for (var i = 0; i < mergeQuestion.length; i++){
-		// 	ansHolder.push(mergeQuestion.i.ans)
-		// }
-		// console.log(ansHolder);
-
-
-
-	  // Display initial question
+		 // Display initial question
 	  displayNext();
 	  
 	  // Click handler for the 'next' button
@@ -101,17 +88,17 @@ function getQuestion(){
 	    }
 	    choose();
 	    
-	    // // If no user selection, progress is stopped
-	    // if (isNaN(selections[questionCounter])) {
-	    //   alert('Please make a selection!');
-	    // } else {
+	    // If no user selection, progress is stopped
+	    if (isNaN(selections[questionCounter])) {
+	      alert('Please make a selection!');
+	    } else {
 	      questionCounter++;
 	      displayNext();
-	    // }
+	    }
 	  });
-  
-	  // Click handler for the 'prev' button
-	  $('#prev').on('click', function (e) {
+	  
+		  // Click handler for the 'prev' button
+		   $('#prev').on('click', function (e) {
 	    e.preventDefault();
 	    
 	    if(quiz.is(':animated')) {
@@ -134,7 +121,14 @@ function getQuestion(){
 	    displayNext();
 	    $('#start').hide();
 	  });
-	  
+  
+	  // Animates buttons on hover
+	  $('.button').on('mouseenter', function () {
+	    $(this).addClass('active');
+	  });
+	  $('.button').on('mouseleave', function () {
+	    $(this).removeClass('active');
+	  });
 	  // Animates buttons on hover
 	  $('.button').on('mouseenter', function () {
 	    $(this).addClass('active');
@@ -153,7 +147,7 @@ function getQuestion(){
 	    var header = $('<h2>Question ' + (index + 1) + ':</h2>');
 	    qElement.append(header);
 	    
-	    var question = $('<p>').append(mergeQuestion[index].question);
+	    var question = $('<p>').append(questionsProg[index].question);
 	    qElement.append(question);
 	    
 	    var radioButtons = createRadios(index);
@@ -167,93 +161,99 @@ function getQuestion(){
 	    var radioList = $('<ul>');
 	    var item;
 	    var input = '';
-	    for (var i = 0; i < mergeQuestion[index].choice.length; i++) {
+	    for (var i = 0; i < questionsProg[index].choice.length; i++) {
 	      item = $('<li>');
 	      input = '<input type="radio" name="answer" value=' + i + ' />';
-	      input += mergeQuestion[index].choice[i];
+	      input += questionsProg[index].choice[i];
 	      item.append(input);
 	      radioList.append(item);
 	    }
 	    return radioList;
 	  }
-  
-	  // // Reads the user selection and pushes the value to an array
-	  // function choose() {
-	  //   selections[questionCounter] = +$('input[name="answer"]:checked').val();
-	  //  	console.log(selections);
-	  // }
-	  
+	 
 	  // Displays next requested element
+	    // Displays next requested element
 	  function displayNext() {
-		    quiz.fadeOut(function() {
-		      $('#question').remove();
-		      
-		      if(questionCounter < mergeQuestion.length){
-		        var nextQuestion = createQuestionElement(questionCounter);
-		        quiz.append(nextQuestion).fadeIn();
-		        if (!(isNaN(selections[questionCounter]))) {
-		          $('input[value='+selections[questionCounter]+']').prop('checked', true);
-		        }
-		        
-		        // Controls display of 'prev' button
-		        if(questionCounter === 1){
-		          $('#prev').show();
-		        } else if(questionCounter === 0){
-		          
-		          $('#prev').hide();
-		          $('#next').show();
-		        }
-		      }else {
-		        var scoreElem = displayScore();
-		        quiz.append(scoreElem).fadeIn();
-		        $('#next').hide();
-		        $('#prev').hide();
-		        $('#start').show();
-		      }
-		    });
-	    }
-
-
+	    quiz.fadeOut(function() {
+	      $('#question').remove();
+	      
+	      if(questionCounter < questionsProg.length){
+	        var nextQuestion = createQuestionElement(questionCounter);
+	        quiz.append(nextQuestion).fadeIn();
+	        if (!(isNaN(selections[questionCounter]))) {
+	          $('input[value='+selections[questionCounter]+']').prop('checked', true);
+	        }
+	        
+	        // Controls display of 'prev' button
+	        if(questionCounter === 1){
+	          $('#prev').show();
+	        } else if(questionCounter === 0){
+	          
+	          $('#prev').hide();
+	          $('#next').show();
+	        }
+	      }else {
+	        var scoreElem = displayScore();
+	        quiz.append(scoreElem).fadeIn();
+	        $('#next').hide();
+	        $('#prev').hide();
+	        $('#start').show();
+	      }
+	    });
+	  }
 
 	    //function to get getSelected botton
 		function choose(){
-			selections[questionCounter] = +$(".modal-body input[type=radio]").each(function(){
-			    if (this.checked){
-			        selections.push(this.value);
-			        this.checked = false;
-			    }
-			});
+			selections[questionCounter] = +$('input[name="answer"]:checked').val();
+			 score(questionCounter);
 
+			 if(selections[questionCounter] === questionsProg.length){
+			 	var userScore = (numCorrect  * 100)
+				updateDB(numCorrect * 100);
+				displayScore();
+
+			 }
 		}
+		function score(questionCounter){
+			var ref =firebase.database().ref().child("quiz/programmingQuestions/0/ans" );
+			ref.once("value", function(snapshot) {
+			var ans = snapshot.val();
+			
+			if (selections[questionCounter] === 1 || 0){
+				numCorrect++
 
-
+			}
+		})
+		}
 	  
 	  // Computes score and returns a paragraph element to be displayed
 	  function displayScore() {
 	    var score = $('<p>',{id: 'question'});
-	  
-	    for (var i = 0; i < mergeQuestion.length; i++) {
-	      if (mergeQuestion[i] === selections[i]) {
-	        numCorrect++;
-	      }
-	    }
-	    var userScore = (numCorrect  * 100)
-		updateDB(userScore);
-
 	    
 	    score.append('You got ' + numCorrect + ' questions out of ' +
-	                 mergeQuestion.length + ' right!!!');
+	                 questionsProg.length + ' right!!!');
 	    return score;
 	  }
-
-
-
-
-
+	  //INITIATE DATABASE
 	var database = firebase.database();
+	////APPEND LEADER BOARD
+		var path = firebase.database().ref('/users');
+		 path.orderByChild("score").limitToLast(10).on("child_added", function(snapshot) {
+	    //test.innerHTML = "<p> The list" + snapshot.val() + "is here</p>"
+	   var data = (snapshot.val());
+	   console.log(data);
 
-	var path = firebase.database().ref('/users');
+	   if (data.score) {
+	    var test = elem("test");
+	    // console.log(data.name + data.score);
 
+	       test.innerHTML += "<h2> name:   " + data.username + "    scored: " + data.score + "</h2>"
+
+	   }
+
+	  });
+
+	///UPDATE THE DATABASE ON COMPLETION OF TEST AND STORE THE USER RECORD
 	function updateDB(score){
 		let pathRef = firebase.database().ref('/users/' + username)
 		pathRef.child(score).update({
@@ -261,6 +261,7 @@ function getQuestion(){
 		});
 		
 	}
+
 
 
 
