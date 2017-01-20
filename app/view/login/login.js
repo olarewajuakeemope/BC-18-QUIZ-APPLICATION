@@ -239,7 +239,6 @@ function getQuestion(){
 	////APPEND LEADER BOARD
 		var path = firebase.database().ref('/users');
 		 path.orderByChild("score").limitToLast(10).on("child_added", function(snapshot) {
-	    //test.innerHTML = "<p> The list" + snapshot.val() + "is here</p>"
 	   var data = (snapshot.val());
 	   console.log(data);
 
