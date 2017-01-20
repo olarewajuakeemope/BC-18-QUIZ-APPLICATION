@@ -8,7 +8,7 @@
   },
   "scripts": {
     "test": "jasmine-node test",
-    "start": "nodemon ./app/app.js"
+    "start": "node app/app.js"
   },
   "repository": {
     "type": "git",
@@ -21,6 +21,7 @@
   },
   "homepage": "https://github.com/adedapopaul/BC-18-QUIZ-APPLICATION#readme",
   "dependencies": {
+    "dotenv": "^4.0.0",
     "ejs": "^2.5.5",
     "express": "^4.14.0",
     "firebase": "^3.6.6",

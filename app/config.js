@@ -1,11 +1,9 @@
-
+// require('dotenv').config()
 var config = {
-    apiKey: "AIzaSyA3-v85rBZXODtmUzkHcwYVRYg6Khw_IAg",
-    authDomain: "quizapp-2105e.firebaseapp.com",
-    databaseURL: "https://quizapp-2105e.firebaseio.com",
-    storageBucket: "quizapp-2105e.appspot.com",
-    messagingSenderId: "80293514890"
+    apiKey: process.env.apiKey,
+    authDomain: process.env.authDomain,
+    databaseURL: process.env.databaseURL,
+    storageBucket: process.env.storageBucket,
+    messagingSenderId: process.env.messagingSenderId
   };
-
-
 
