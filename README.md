@@ -19,9 +19,3 @@
 * CSS
 * JavaScript
 * JQuery
-
-##Credit
-
-* Bootcamp facilitators
-* Fellow Bootcampers
-* Andela
